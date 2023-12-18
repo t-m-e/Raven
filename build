@@ -1,0 +1,73 @@
+#!/usr/bin/bash 
+
+# Build script
+# * build project with different rules and options
+# * build options
+#   b:   
+#       debug
+#       release
+
+# variables
+BUILD_TYPE=''
+COMPILE_COMMAND=''
+
+# constants
+CC="gcc"
+CFLAGS="-Wall -Werror -Wpedantic"
+SRC="src"
+INCLUDE=""
+EXE="shell"
+
+# create include paths
+for item in `ls src`; do
+    if [[ ! -d $SRC/$item ]]; then
+        continue
+    fi
+    INCLUDE="$INCLUDE -I$(pwd)/src/$item/include"
+done
+
+echo "[info] include: $INCLUDE"
+
+# parse options
+while getopts ":b" opt; do
+    case $opt in
+        b) BUILD_TYPE="$OPTARG";; 
+    esac
+done
+
+# check if there is a valid build type
+if [[ $BUILD_TYPE -eq "debug" ]]; then 
+    COMPILE_COMMAND="$CC -g $CFLAGS "
+elif [[ $BUILD_TYPE -eq "release" ]]; then 
+    COMPILE_COMMAND="$CC -O3 $CFLAGS "
+else 
+    echo "[error] invalid build type \"-b $BUILD_TYPE\". expected: debug, release"
+    exit 255
+fi
+
+# check if ./lib directory exists
+if [[ ! -d ./lib ]]; then 
+    mkdir ./lib
+fi 
+
+# need code which supports compilations of nested directories    
+for item in `ls $SRC`; do
+    if [[ -d "$SRC/$item" ]]; then
+        for subitem in `ls $SRC/$item`; do
+            if [[ -d $SRC/$item/$subitem ]] || [[ $subitem == "README.md" ]]; then
+                continue
+            fi
+            $COMPILE_COMMAND $INCLUDE $SRC/$item/$subitem -c -o ./lib/$subitem.o
+        done
+    else 
+        $COMPILE_COMMAND $INCLUDE $SRC/$item -c -o ./lib/$item.o
+    fi
+
+    if [[ ! $? -eq 0 ]]; then
+        echo "[error] failed to compile $SRC/$item"
+        exit 255
+    fi 
+done
+
+# compile ./lib -> exe
+$CC ./lib/* -o $EXE

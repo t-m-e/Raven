@@ -1,0 +1,83 @@
+# comment 
+
+# define a variable
+# var ::= "let" ( id ":" )? id "=" expr ;
+let a = "something" 
+let ns:a = "something under a namespace"
+let list_var = ["a", "b", "c", "d"]
+let global\dict = { "a" : 'something good', "b" : 'something else good' }
+
+# define a function
+function something()
+    let ns:b = "something else under a namespace"
+    return ns:b
+endfunction
+
+# output
+echo(ns:b)
+echo("Hello, Script")
+
+# data types
+let string = "this is a string"
+let integer = 1
+
+# global namespacing
+# g_namespace ::= id "\" id ;
+function g_ns\function_for_something() 
+    echo("function for something")
+endfunction 
+
+# calling a function 
+call g_ns\function_for_something()
+call something()
+
+# do some string/math operations
+# add 2 strings
+let s1 = "hello" + ", world"
+let s2 = s1 + ". I am a string"
+let n1 = 2 + 4
+let n2 = n1 / 3
+let n3 = n1 * n2
+let n4 = n3 - n1
+# -- other operations should be tested for if necessary
+
+# conditionals/loops
+# branching
+let char = "c"
+if char == "a"
+    echo("char == 'a'")
+elseif char == 'b'
+    echo("char == 'b'")
+else
+    echo("char == probably 'c'")
+endif
+
+# if statement one-liner
+if char == "a"; echo("char == 'a'"); endif
+
+# match statement
+match char
+    "a" | echo("char is 'a'") 
+    "b" | echo("char is 'b'") 
+    "c" | echo("char is 'c'") 
+endmatch
+
+# for loop
+let list = ["a", "b", "c", "d"]
+for item in list
+    echo(item)
+    continue    # go to next iteration
+    break       # break out of loop
+endfor 
+
+# while loop
+while list != []
+    list = list[1:]     # get elements 1 -> end of list
+endwhile
+
+# === somethings for future development ===
+# FFI to create new commands 
+bind("bash", "/usr/bin/bash")
+
+# calling bash scripts to be run?
+bash("echo 'bash called'")

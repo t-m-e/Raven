@@ -1,0 +1,3 @@
+[submodule "src/Argparse"]
+	path = src/Argparse
+	url = https://github.com/t-m-e/Argparse.git
